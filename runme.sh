@@ -14,7 +14,19 @@ msg()    { echo -e "${*} \e[0m" >&2;:;}
 success() { echo -e "${_c_green}${*} \e[0m" >&2;:;}
 
 shout "Setting adb for termux.."
-cp -rv binary/"$(uname -m)"/bin/* /data/data/com.termux/files/usr/bin
+# arch translator
+case $(uname -m) in
+    arm64|aarch64)
+    dir="arm64-v8a";;
+    armhf|armv7l|armv8l)
+    dir="armeabi-v7a";;
+    i386|i868|x86)
+    dir="x86";;
+    amd64|x86_64)
+    dir="x84_64"
+    ;;
+esac
+cp -rv binary/"$dir"/bin/* /data/data/com.termux/files/usr/bin
 success "Done.."
 
 shout "Staring adb connect sequence.."
