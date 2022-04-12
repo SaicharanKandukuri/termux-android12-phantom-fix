@@ -1,6 +1,6 @@
 # Instructions
 #### Step 1.
-Open termux and settings -> Developer Options -> Wireless Debugging in split screen like this
+Open termux and settings -> [Developer Options](https://developer.android.com/studio/debug/dev-options) -> Wireless Debugging in split screen like this
 ![](images/split-screen.jpg)
 #### Step 2.
 Connect to a local wifi network and turn on **use wireless debugging** button and press allow button
