@@ -34,10 +34,19 @@ adb connect localhost:$debugport || {
 adb tcpip 5813 || {
     die "failed to start tcpip"
 }
-
 success "Enabled"
 
 shout "List connected devices.."
 adb devices -l
-
 success "ADB setup complete..."
+
+shout "Trying to fix phantom service for this session.."
+adb -s localhost:55557 \
+        shell \
+        device_config \
+        put activity_manager \
+        max_phantom_processes 214181594 || {
+            lwarn "Failed to set max_phantom_processes"
+        }
+success "current max_phantom_processes = $(adb -s localhost:55557 shell device_config get activity_manager max_phantom_processes)"
+
