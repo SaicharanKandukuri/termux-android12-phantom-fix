@@ -31,6 +31,10 @@ shout "Trying to enable adb over tcpip at 5813"
 adb connect localhost:$debugport || {
     die "Failed to connect.."
 }
+adb tcpip 5813 || {
+    die "failed to start tcpip"
+}
+
 success "Enabled"
 
 shout "List connected devices.."
