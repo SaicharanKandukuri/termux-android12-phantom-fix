@@ -32,39 +32,58 @@ success() {
     :
 }
 
-echo "Enter Auth port ( Port show in option enter six digit number): "
+F=0
+
+msg "${_c_magneta}Enter Auth port ( Port show in option enter six digit number): "
 read -r authport
-echo "Enter Auth pincode: "
+msg "${_c_magneta}Enter Auth pincode: "
 read -r authpincode
 
-echo "Enter debug port: "
+msg "${_c_magneta}Enter debug port: "
 read -r debugport
 
-shout "Trying to pair"
-adb pair localhost:$authport $authpincode || {
-    die "Connection Failed?"
+pair() {
+    shout "Trying to pair"
+    adb pair localhost:"$authport" "$authpincode" || {
+        die "Connection Failed?"
+    }
 }
+
+pair
+
 success "Pairing localhost:$authport succeed.."
 
-shout "Trying to enable adb over tcpip at 5813"
-adb connect localhost:$debugport || {
-    die "Failed to connect.."
+connect() {
+    shout "Trying to enable adb over tcpip at 5813"
+    adb connect localhost:"$debugport" || {
+        warn "Failed to connect.."
+        shout "Trying to pair back"
+        [[ $F -gt 3 ]] && {
+            die "Failed to connect.. Max retry reached"
+        }
+        ((F++))
+        pair
+        connect
+    }
 }
+
 adb tcpip 5813 || {
     die "failed to start tcpip"
 }
+
 success "Enabled"
 
 shout "List connected devices.."
 adb devices -l
 success "ADB setup complete..."
 
-shout "Trying to fix phantom service for this session.."
-adb \
-    shell \
-    device_config \
-    put activity_manager \
-    max_phantom_processes 214181594 || {
-    lwarn "Failed to set max_phantom_processes"
-}
+shout "disabling sig9 fix.."
+
+# Freeze config
+abd device_config \
+    set_sync_disabled_for_tests none || {
+        die "Failed to disable.."
+    }
+echo "✌️ Disabled"
+
 success "current max_phantom_processes = $(adb shell device_config get activity_manager max_phantom_processes)"

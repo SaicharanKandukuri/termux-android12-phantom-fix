@@ -29,9 +29,6 @@ esac
 cp -rv binary/"$dir"/bin/* /data/data/com.termux/files/usr/bin
 success "Done.."
 
-shout "Staring adb connect sequence.."
-bash initadb.sh
+shout "start fix script"
+bash sig9-fix.sh
 
-shout "applying phantom fix on startup to termux.."
-bash chillup-phantom-onstartup.sh
-shout "Done.."
