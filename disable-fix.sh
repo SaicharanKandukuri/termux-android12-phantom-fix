@@ -84,8 +84,9 @@ shout "disabling sig9 fix.."
 # Freeze config
 adb shell device_config \
     set_sync_disabled_for_tests none || {
-        die "Failed to disable.."
+        die "Failed to disable.. [Try executing again]"
     }
 echo "✌️ Disabled"
+echo "Changes may take place after a device restart.."
 
 success "current max_phantom_processes = $(adb shell device_config get activity_manager max_phantom_processes)"

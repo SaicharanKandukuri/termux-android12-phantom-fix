@@ -84,13 +84,20 @@ shout "Trying to fix phantom service ${_c_green}forever"
 
 # Freeze config
 adb shell device_config \
-    set_sync_disabled_for_tests persistent
+    set_sync_disabled_for_tests persistent || {
+        die "failed to freeze config [Try executing again]"
+    }
 
 adb \
     shell \
     device_config \
     put activity_manager \
     max_phantom_processes 214181594 || {
-    warn "Failed to set max_phantom_processes"
+    die "Failed to set max_phantom_processes [Try executing again]"
 }
 success "current max_phantom_processes = $(adb shell device_config get activity_manager max_phantom_processes)"
+
+msg "if you ever want to disable this fix run:"
+msg "${_c_green} bash disable-fix.sh"
+echo "Or"
+msg "adb shell device_config set_sync_disabled_for_tests none ${RST} from your pc"
