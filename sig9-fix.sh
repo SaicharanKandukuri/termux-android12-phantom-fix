@@ -67,9 +67,6 @@ connect() {
     }
 }
 
-adb tcpip 5813 || {
-    die "failed to start tcpip"
-}
 
 success "Enabled"
 
