@@ -53,10 +53,6 @@ else
         }
     }
 
-    pair
-
-    success "Pairing localhost:$authport succeed.."
-
     connect() {
         shout "Trying to enable adb over tcpip at 5813"
         adb connect localhost:"$debugport" || {
@@ -71,7 +67,12 @@ else
         }
     }
 
+    pair
+    connect
+    success "Pairing localhost:$authport succeed.."
+
 fi
+
 success "Enabled"
 
 shout "List connected devices.."
@@ -81,7 +82,7 @@ success "ADB setup complete..."
 shout "disabling sig9 fix.."
 
 # Freeze config
-abd device_config \
+adb shell device_config \
     set_sync_disabled_for_tests none || {
         die "Failed to disable.."
     }

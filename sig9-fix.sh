@@ -42,30 +42,36 @@ read -r authpincode
 msg "${_c_magneta}Enter debug port: "
 read -r debugport
 
-pair() {
+# Check is the device already conected somehow
+if adb devices | grep -q "$authport" | grep "device" >> /dev/null; then
+    msg "Device is connected.."
+else
+    pair() {
     shout "Trying to pair"
     adb pair localhost:"$authport" "$authpincode" || {
-        die "Connection Failed?"
-    }
-}
-
-pair
-
-success "Pairing localhost:$authport succeed.."
-
-connect() {
-    shout "Trying to enable adb over tcpip at 5813"
-    adb connect localhost:"$debugport" || {
-        warn "Failed to connect.."
-        shout "Trying to pair back"
-        [[ $F -gt 3 ]] && {
-            die "Failed to connect.. Max retry reached"
+            die "Connection Failed?"
         }
-        ((F++))
-        pair
-        connect
     }
-}
+
+    connect() {
+        shout "Trying to enable adb over tcpip at 5813"
+        adb connect localhost:"$debugport" || {
+            warn "Failed to connect.."
+            shout "Trying to pair back"
+            [[ $F -gt 3 ]] && {
+                die "Failed to connect.. Max retry reached"
+            }
+            ((F++))
+            pair
+            connect
+        }
+    }
+
+    pair
+    connect
+    success "Pairing localhost:$authport succeed.."
+
+fi
 
 
 success "Enabled"
@@ -77,7 +83,7 @@ success "ADB setup complete..."
 shout "Trying to fix phantom service ${_c_green}forever"
 
 # Freeze config
-abd device_config \
+adb shell device_config \
     set_sync_disabled_for_tests persistent
 
 adb \
@@ -85,6 +91,6 @@ adb \
     device_config \
     put activity_manager \
     max_phantom_processes 214181594 || {
-    lwarn "Failed to set max_phantom_processes"
+    warn "Failed to set max_phantom_processes"
 }
 success "current max_phantom_processes = $(adb shell device_config get activity_manager max_phantom_processes)"
