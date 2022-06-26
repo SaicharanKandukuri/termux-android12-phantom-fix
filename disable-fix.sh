@@ -42,31 +42,36 @@ read -r authpincode
 msg "${_c_magneta}Enter debug port: "
 read -r debugport
 
-pair() {
+# Check is the device already conected somehow
+if adb devices | grep -q "$authport" | grep "device" >> /dev/null; then
+    msg "Device is connected.."
+else
+    pair() {
     shout "Trying to pair"
     adb pair localhost:"$authport" "$authpincode" || {
-        die "Connection Failed?"
-    }
-}
-
-pair
-
-success "Pairing localhost:$authport succeed.."
-
-connect() {
-    shout "Trying to enable adb over tcpip at 5813"
-    adb connect localhost:"$debugport" || {
-        warn "Failed to connect.."
-        shout "Trying to pair back"
-        [[ $F -gt 3 ]] && {
-            die "Failed to connect.. Max retry reached"
+            die "Connection Failed?"
         }
-        ((F++))
-        pair
-        connect
     }
-}
 
+    pair
+
+    success "Pairing localhost:$authport succeed.."
+
+    connect() {
+        shout "Trying to enable adb over tcpip at 5813"
+        adb connect localhost:"$debugport" || {
+            warn "Failed to connect.."
+            shout "Trying to pair back"
+            [[ $F -gt 3 ]] && {
+                die "Failed to connect.. Max retry reached"
+            }
+            ((F++))
+            pair
+            connect
+        }
+    }
+
+fi
 success "Enabled"
 
 shout "List connected devices.."
