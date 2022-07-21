@@ -9,5 +9,8 @@ This repo contains code to fix **signal 9** issues with termux and android 12 de
 # Instructions
 for instrction see [here](INSTRUCTIONS.md):
 
+Checkout blog for step by step instructions & explanations without this script => 
+[/termux-signal9-fix](https://saicharankandukuri.github.io/posts/termux-signal9-fix/)
+
 # License
 Copyright 2022 [saicharankandukuri](https://github.com/SaicharanKandukuri) under GPL V3
